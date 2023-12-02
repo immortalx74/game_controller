@@ -2,7 +2,22 @@
  
 ### Game controller library for [LÖVR](https://lovr.org/) 
 
-### API
+### General use notes:
+First require the library: `local gc = require "game_controller"`
+
+On `lovr.load` call `getDeviceCount` to get the number of connected devices at the time the application starts.
+
+Ideally, you should also store each device's unique identifier at this point, by calling `getDeviceGUID`. This will be useful later because the index (jid) passed into various functions of the lib isn't guaranteed to be the same between different runs of your app, or if a device was connected/disconnected.
+
+The idea is that you can check against your stored GUIDs to correctly identify a specific device.
+
+Another option is to call `getDeviceName` but this also isn't guaranteed to be unique. There are cases where some generic gamepads are simply just called "USB Device".
+
+You can check if a device was connected/disconnected at runtime by querying `configurationChanged`.
+
+The rest are mostly polling functions which are self explanatory.
+
+### API:
 ---
 `isDevicePresent( jid )`
 
