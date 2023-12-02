@@ -54,4 +54,18 @@
 - Down = 4
 - Left = 8
 
-The other combinations can be retrieved by ORing 2 values. e.g. for Right+Up: `bit.bor( 2, 1 )`
+#### The other combinations can be retrieved by ORing 2 values. e.g. for Right+Up: `bit.bor( 2, 1 )`
+---
+`configurationChanged()`
+
+#### Detects if a device was connected/disconnected
+#### Returns `boolean`, `string`, `number`,
+[1] true if a device was connected/disconnected
+
+[2] string describing the event ("connected" or "disconnected")
+
+[3] index of the device
+
+NOTE: This should normally be called every frame and it will return true only for the particular frame where a change was detected.
+
+---

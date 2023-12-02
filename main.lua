@@ -6,6 +6,11 @@ function lovr.load()
 end
 
 function lovr.update( dt )
+	local result, type, device = gc.configurationChanged()
+	if result then
+		print( "Device: " .. device .. " was " .. type )
+	end
+
 	if gc.isDevicePresent( 1 ) then
 		local btn_count = gc.getButtonCount( 1 )
 		for i = 1, btn_count do

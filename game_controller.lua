@@ -12,9 +12,13 @@ const char* glfwGetJoystickName(int jid);
 const float* glfwGetJoystickAxes(int jid, int* count);
 const unsigned char* glfwGetJoystickButtons(int jid, int* count);
 const unsigned char* glfwGetJoystickHats(int jid, int* count);
+typedef void (*GLFWjoystickfun)(int jid, int event);
+GLFWjoystickfun glfwSetJoystickCallback(GLFWjoystickfun callback);
 ]] )
 
 local m = {}
+
+local device_connected_or_disconnected = { id = 0, ev = 0, changed = false }
 
 -- Internals
 local function getDeviceAxes( jid )
@@ -40,6 +44,14 @@ local function getDeviceHats( jid )
 
 	return count[ 0 ], hats
 end
+
+local function joystickCallback( jid, ev )
+	device_connected_or_disconnected.id = jid
+	device_connected_or_disconnected.ev = ev
+	device_connected_or_disconnected.changed = true
+end
+
+glfw.glfwSetJoystickCallback( joystickCallback );
 
 -- API
 function m.isDevicePresent( jid )
@@ -92,6 +104,25 @@ end
 function m.getHatState( jid, hid )
 	local count, hats = getDeviceHats( jid )
 	return hats[ hid - 1 ]
+end
+
+function m.configurationChanged()
+	local result = false
+	local type = "idle"
+
+	if device_connected_or_disconnected.changed then
+		result = true
+		
+		if device_connected_or_disconnected.ev == 0x00040001 then
+			type = "connected"
+		elseif device_connected_or_disconnected.ev == 0x00040002 then
+			type = "disconnected"
+		end
+	end
+
+	device_connected_or_disconnected.changed = false
+
+	return result, type, device_connected_or_disconnected.id + 1
 end
 
 return m
