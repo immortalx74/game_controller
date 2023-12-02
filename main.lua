@@ -3,6 +3,9 @@ local num_devices = gc.getDeviceCount()
 
 function lovr.load()
 	print( "Number of devices: " .. num_devices )
+	for i = 1, num_devices do
+		print( "Index: " .. i .. ", GUID: " .. gc.getDeviceGUID( i ) )
+	end
 end
 
 function lovr.update( dt )

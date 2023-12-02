@@ -14,6 +14,7 @@ const unsigned char* glfwGetJoystickButtons(int jid, int* count);
 const unsigned char* glfwGetJoystickHats(int jid, int* count);
 typedef void (*GLFWjoystickfun)(int jid, int event);
 GLFWjoystickfun glfwSetJoystickCallback(GLFWjoystickfun callback);
+const char* glfwGetJoystickGUID(int jid);
 ]] )
 
 local m = {}
@@ -112,7 +113,7 @@ function m.configurationChanged()
 
 	if device_connected_or_disconnected.changed then
 		result = true
-		
+
 		if device_connected_or_disconnected.ev == 0x00040001 then
 			type = "connected"
 		elseif device_connected_or_disconnected.ev == 0x00040002 then
@@ -123,6 +124,10 @@ function m.configurationChanged()
 	device_connected_or_disconnected.changed = false
 
 	return result, type, device_connected_or_disconnected.id + 1
+end
+
+function m.getDeviceGUID( jid )
+	return ffi.string( glfw.glfwGetJoystickGUID( jid - 1 ) )
 end
 
 return m

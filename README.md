@@ -69,3 +69,8 @@
 NOTE: This should normally be called every frame and it will return true only for the particular frame where a change was detected.
 
 ---
+`getDeviceGUID( jid )`
+
+#### Gets the global unique identifier of a device
+#### Returns `string`
+---
