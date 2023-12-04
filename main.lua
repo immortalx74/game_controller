@@ -1,10 +1,15 @@
 local gc = require "game_controller"
 local num_devices = gc.getDeviceCount()
+local ffi = require( "ffi" )
 
 function lovr.load()
 	print( "Number of devices: " .. num_devices )
 	for i = 1, num_devices do
-		print( "Index: " .. i .. ", GUID: " .. gc.getDeviceGUID( i ) )
+		local name = "-N/A-"
+		if gc.isDeviceGamepad( i ) then
+			name = gc.getGamepadName( i )
+		end
+		print( "Index: " .. i .. ", GUID: " .. gc.getDeviceGUID( i ) .. ", Name: " .. gc.getDeviceName( i ) .. ", Gamepad name: " .. name )
 	end
 end
 

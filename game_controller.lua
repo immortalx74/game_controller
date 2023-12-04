@@ -15,11 +15,46 @@ const unsigned char* glfwGetJoystickHats(int jid, int* count);
 typedef void (*GLFWjoystickfun)(int jid, int event);
 GLFWjoystickfun glfwSetJoystickCallback(GLFWjoystickfun callback);
 const char* glfwGetJoystickGUID(int jid);
+int glfwUpdateGamepadMappings(const char *string);
+int glfwJoystickIsGamepad(int jid);
+const char* glfwGetGamepadName(int jid);
+int glfwGetGamepadState(int jid, GLFWgamepadstate* state);
 ]] )
 
-local m = {}
+GAMEPAD_BUTTON_A                       = 0
+GAMEPAD_BUTTON_B                       = 1
+GAMEPAD_BUTTON_X                       = 2
+GAMEPAD_BUTTON_Y                       = 3
+GAMEPAD_BUTTON_LEFT_BUMPER             = 4
+GAMEPAD_BUTTON_RIGHT_BUMPER            = 5
+GAMEPAD_BUTTON_BACK                    = 6
+GAMEPAD_BUTTON_START                   = 7
+GAMEPAD_BUTTON_GUIDE                   = 8
+GAMEPAD_BUTTON_LEFT_THUMB              = 9
+GAMEPAD_BUTTON_RIGHT_THUMB             = 10
+GAMEPAD_BUTTON_DPAD_UP                 = 11
+GAMEPAD_BUTTON_DPAD_RIGHT              = 12
+GAMEPAD_BUTTON_DPAD_DOWN               = 13
+GAMEPAD_BUTTON_DPAD_LEFT               = 14
+GAMEPAD_BUTTON_LAST                    = GAMEPAD_BUTTON_DPAD_LEFT
+GAMEPAD_BUTTON_CROSS                   = GAMEPAD_BUTTON_A
+GAMEPAD_BUTTON_CIRCLE                  = GAMEPAD_BUTTON_B
+GAMEPAD_BUTTON_SQUARE                  = GAMEPAD_BUTTON_X
+GAMEPAD_BUTTON_TRIANGLE                = GAMEPAD_BUTTON_Y
+
+GAMEPAD_AXIS_LEFT_X                    = 0
+GAMEPAD_AXIS_LEFT_Y                    = 1
+GAMEPAD_AXIS_RIGHT_X                   = 2
+GAMEPAD_AXIS_RIGHT_Y                   = 3
+GAMEPAD_AXIS_LEFT_TRIGGER              = 4
+GAMEPAD_AXIS_RIGHT_TRIGGER             = 5
+
+local m                                = {}
 
 local device_connected_or_disconnected = { id = 0, ev = 0, changed = false }
+local f                                = io.open( "gamecontrollerdb.txt", "r" )
+local str                              = f:read( "*all" )
+glfw.glfwUpdateGamepadMappings( str )
 
 -- Internals
 local function getDeviceAxes( jid )
@@ -77,6 +112,10 @@ function m.getDeviceName( jid )
 	return ffi.string( glfw.glfwGetJoystickName( jid - 1 ) )
 end
 
+function m.getGamepadName( jid )
+	return ffi.string( glfw.glfwGetGamepadName( jid - 1 ) )
+end
+
 function m.getButtonCount( jid )
 	local count, btn = getDeviceButtons( jid )
 	return count
@@ -128,6 +167,20 @@ end
 
 function m.getDeviceGUID( jid )
 	return ffi.string( glfw.glfwGetJoystickGUID( jid - 1 ) )
+end
+
+function m.isDeviceGamepad( jid )
+	if glfw.glfwJoystickIsGamepad( jid - 1 ) == 1 then
+		return true
+	end
+
+	return false
+end
+
+function m.getGamepadState( jid )
+	local state = ffi.new( "GLFWgamepadstate" )
+	glfw.glfwGetGamepadState( jid - 1, state )
+	return state
 end
 
 return m

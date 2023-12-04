@@ -15,6 +15,11 @@ Another option is to call `getDeviceName` but this also isn't guaranteed to be u
 
 You can check if a device was connected/disconnected at runtime by querying `configurationChanged`.
 
+There's a database of known game-controllers maintained by the SDL community.
+A version of this file is included with this library, but the latest version can be found in this [link](https://github.com/gabomdq/SDL_GameControllerDB) so that you can replace it anytime.
+
+At the start of the app, the library reads this file to get updated information about these known game-controllers. It is used for mapping buttons/axes of different controllers to a common format. You can query if a connected device is one of these by calling `isDeviceGamepad`, and then call `getGamepadState` to get the state of buttons/axes using named values instead of indices. (See example in the API below)
+
 The rest are mostly polling functions which are self explanatory.
 
 ### API:
@@ -33,6 +38,13 @@ The rest are mostly polling functions which are self explanatory.
 
 #### Get the name of the device with the specified index
 #### Returns `string`
+---
+`getGamepadName( jid )`
+
+#### Get the name of the gamepad with the specified index (if the device is a gamepad)
+#### Returns `string`
+NOTE: Always check if the device is a gamepad with `isDeviceGamepad`
+
 ---
 `getButtonCount( jid )`
 
@@ -88,4 +100,21 @@ NOTE: This should normally be called every frame and it will return true only fo
 
 #### Gets the global unique identifier of a device
 #### Returns `string`
+---
+`getGamepadState( jid )`
+
+#### Get the buttons/axes state of the device with the specified index (if the device is a gamepad)
+#### Returns `table`
+NOTE: The returned table fields are `buttons` and `axes`
+Each field is an array that can be indexed with named values. Example:
+
+`local value = getGamepadState( 1 ).axes[ GAMEPAD_AXIS_LEFT_X ]`
+In this case the value of the axis named `GAMEPAD_AXIS_LEFT_X`, for the device with index 1 is returned.
+
+---
+`isDeviceGamepad( jid )`
+
+#### Check if the device with the specified index is a gamepad
+#### Returns `boolean`
+
 ---
