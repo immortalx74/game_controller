@@ -7,6 +7,7 @@ typedef struct GLFWgamepadstate {
     float axes[6];
 } GLFWgamepadstate;
 
+int glfwInit(void);
 int glfwJoystickPresent(int jid);
 const char* glfwGetJoystickName(int jid);
 const float* glfwGetJoystickAxes(int jid, int* count);
@@ -54,6 +55,8 @@ local m                                = {}
 local device_connected_or_disconnected = { id = 0, ev = 0, changed = false }
 local f                                = io.open( "gamecontrollerdb.txt", "r" )
 local str                              = f:read( "*all" )
+
+glfw.glfwInit()
 glfw.glfwUpdateGamepadMappings( str )
 
 -- Internals
