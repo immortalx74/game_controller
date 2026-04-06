@@ -52,6 +52,7 @@ GAMEPAD_AXIS_RIGHT_TRIGGER             = 5
 
 local m                                = {}
 
+local previous_states                  = nil
 local device_connected_or_disconnected = { id = 0, ev = 0, changed = false }
 local f                                = io.open( "gamecontrollerdb.txt", "r" )
 local str                              = f:read( "*all" )
@@ -79,7 +80,7 @@ end
 local function getDeviceHats( jid )
 	local count = ffi.new( "int[1]" )
 	local hats = ffi.new( "char[32]" )
-	hats = glfw.glfwGetJoystickHats( jid, count )
+	hats = glfw.glfwGetJoystickHats( jid - 1, count )
 
 	return count[ 0 ], hats
 end
@@ -150,22 +151,31 @@ function m.getHatState( jid, hid )
 end
 
 function m.configurationChanged()
+	if previous_states == nil then
+		previous_states = {}
+		for i = 0, 15 do
+			previous_states[ i ] = glfw.glfwJoystickPresent( i ) == 1
+		end
+
+		return false, "idle", 0
+	end
+
 	local result = false
-	local type = "idle"
+	local event_type = "idle"
+	local changed_id = 0
 
-	if device_connected_or_disconnected.changed then
-		result = true
+	for i = 0, 15 do
+		local present = glfw.glfwJoystickPresent( i ) == 1
 
-		if device_connected_or_disconnected.ev == 0x00040001 then
-			type = "connected"
-		elseif device_connected_or_disconnected.ev == 0x00040002 then
-			type = "disconnected"
+		if present ~= previous_states[ i ] then
+			result = true
+			changed_id = i + 1
+			event_type = present and "connected" or "disconnected"
+			previous_states[ i ] = present
 		end
 	end
 
-	device_connected_or_disconnected.changed = false
-
-	return result, type, device_connected_or_disconnected.id + 1
+	return result, event_type, changed_id
 end
 
 function m.getDeviceGUID( jid )
